@@ -1,6 +1,7 @@
 
 buildscript {
   repositories {
+    mavenLocal()
     gradlePluginPortal()
   }
   dependencies {
@@ -52,24 +53,22 @@ run {
 }
 
 jar {
-// sets the name of the .jar file this produces to the name of the game or app, with the version after.
   archiveFileName.set("${appName}-${projectVersion}.jar")
-// the duplicatesStrategy matters starting in Gradle 7.0; this setting works.
   duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-  dependsOn configurations.runtimeClasspath
-  from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
-// these "exclude" lines remove some unnecessary duplicate files in the output JAR.
-  exclude('META-INF/INDEX.LIST', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA')
-  dependencies {
-    exclude('META-INF/INDEX.LIST', 'META-INF/maven/**')
+
+  // include all runtime deps in the fat‑jar
+  from {
+    configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
   }
-// setting the manifest makes the JAR runnable.
+
   manifest {
-    attributes 'Main-Class': project.mainClassName
+    attributes 'Main-Class': mainClassName  // or use the ApplicationPluginExtension version
   }
-// this last step may help on some OSes that need extra instruction to make runnable JARs.
+
+  // Make the jar executable on *nix
   doLast {
-    file(archiveFile).setExecutable(true, false)
+    File jarFile = (File) archiveFile.get().asFile
+    jarFile.setExecutable(true, false)
   }
 }
 
@@ -124,12 +123,12 @@ construo {
     version.set("$projectVersion")
 
     targets.configure {
-      create("linuxX64", Target.Linux) {
+      register("linuxX64", Target.Linux) {
         architecture.set(Target.Architecture.X86_64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_linux_hotspot_17.0.15_6.tar.gz")
         // Linux does not currently have a way to set the icon on the executable
       }
-      create("macM1", Target.MacOs) {
+      register("macM1", Target.MacOs) {
         architecture.set(Target.Architecture.AARCH64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_aarch64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
@@ -137,7 +136,7 @@ construo {
         // Optional: icon for macOS, as an ICNS file
         macIcon.set(project.file("icons/logo.icns"))
       }
-      create("macX64", Target.MacOs) {
+      register("macX64", Target.MacOs) {
         architecture.set(Target.Architecture.X86_64)
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_mac_hotspot_17.0.15_6.tar.gz")
         // macOS needs an identifier
@@ -145,7 +144,7 @@ construo {
         // Optional: icon for macOS, as an ICNS file
         macIcon.set(project.file("icons/logo.icns"))
       }
-      create("winX64", Target.Windows) {
+      register("winX64", Target.Windows) {
         architecture.set(Target.Architecture.X86_64)
         // Optional: icon for Windows, as a PNG
         icon.set(project.file("icons/logo.png"))
@@ -165,10 +164,10 @@ distributions {
   main {
     contents {
       into('libs') {
-        project.configurations.runtimeClasspath.files.findAll { file ->
-          file.getName() != project.tasks.jar.outputs.files.singleFile.name
-        }.each { file ->
-          exclude file.name
+        from({ configurations.runtimeClasspath })
+        rename { fileName ->
+          // drop duplicates of the fat‑jar itself
+          fileName == tasks.jar.archiveFileName.get() ? null : fileName
         }
       }
     }

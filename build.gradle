@@ -17,7 +17,8 @@ buildscript {
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
-
+  group   = "io.robelabr"
+  version = "1.0-SNAPSHOT"
   // This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
   idea {
     module {
@@ -28,8 +29,7 @@ allprojects {
   repositories {
     mavenCentral()
     maven {
-      url "https://jitpack.io"
-    }    // << JitPack repo for gdx‑svg
+      url "https://jitpack.io" }    // << JitPack repo for gdx‑svg
   }
 }
 

@@ -4,9 +4,14 @@ eclipse.project.name = appName + '-core'
 dependencies {
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  implementation "com.github.raeleus:gdx-svg:2.4.0" // <-- latest as of May 2025
+  implementation 'com.github.KaiosKen:Fundametals:master'
+  implementation 'com.github.lyze237:gdx-TinyVG:main-SNAPSHOT'
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
+}
+
+repositories {
+  mavenLocal()
 }
