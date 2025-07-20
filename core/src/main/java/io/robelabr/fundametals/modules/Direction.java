@@ -25,11 +25,28 @@ public enum Direction {
     }
 
     /**
-     * Creates a flipped version of the current object
-     * @return an Object facing the opposing direction
+     * Returns the direction that is 180° opposite of this one.
      */
     public Direction opposite() {
-        return values()[(ordinal() + 2) & 3];
+        return switch (this) {
+            case NORTH -> SOUTH;
+            case SOUTH -> NORTH;
+            case EAST  -> WEST;
+            case WEST  -> EAST;
+        };
     }
+
+    /**
+     * Rotates the direction 90 degrees clockwise.
+     */
+    public Direction rotate90() {
+        return switch (this) {
+            case NORTH -> EAST;
+            case EAST  -> SOUTH;
+            case SOUTH -> WEST;
+            case WEST  -> NORTH;
+        };
+    }
+
 }
 

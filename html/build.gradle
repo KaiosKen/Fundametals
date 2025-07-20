@@ -9,9 +9,23 @@ buildscript {
 
   }
 }
+
 apply plugin: "gwt"
 apply plugin: "war"
 apply plugin: "org.gretty"
+
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(11)
+  }
+}
+def java11 = javaToolchains.launcherFor {
+  languageVersion = JavaLanguageVersion.of(11)
+}.get()
+
+tasks.named("compileGwt") {
+  javaLauncher.set(java11)
+}
 
 gwt {
   gwtVersion = "$gwtFrameworkVersion" // Should match the version used for building the GWT backend. See gradle.properties.

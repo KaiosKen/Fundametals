@@ -5,13 +5,11 @@ import java.util.List;
 
 public class Wire {
 
-    private Port input, output;
-    List<Point2D> waypoints;
 
-    Wire(Port input, Port output) {
-        this.input = input;
-        this.output = output;
-    }
+
+    /** Simple propagation: 0 → false, >0 → true (can be replaced later). */
+    public void updateSignal() {  }
+
 
 
 }

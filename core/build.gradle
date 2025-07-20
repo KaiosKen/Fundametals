@@ -1,11 +1,25 @@
+
+plugins {
+  id "java-library"
+  id "maven-publish"
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+    }
+  }
+}
+
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 eclipse.project.name = appName + '-core'
 
 dependencies {
   api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
   api "com.badlogicgames.gdx:gdx:$gdxVersion"
-  implementation 'com.github.KaiosKen:Fundametals:master'
-  implementation 'com.github.lyze237:gdx-TinyVG:main-SNAPSHOT'
+  implementation "com.github.lyze237:gdx-TinyVG:$gdxTinyVGVersion"
+  implementation "com.github.earlygrey:shapedrawer:$shapeDrawerVersion"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
